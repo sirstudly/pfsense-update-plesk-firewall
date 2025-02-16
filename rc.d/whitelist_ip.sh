@@ -2,7 +2,7 @@
 
 # REQUIRE: FILESYSTEMS
 # REQUIRE: NETWORKING
-# PROVIDE: whitelist-ip
+# PROVIDE: whitelist_ip
 
 . /etc/rc.subr
 
