@@ -145,10 +145,10 @@ def apply_changes(forgery_protection_token: str) -> None:
 
 
 def main():
+    load_config()
     load_logging_config()
     while True:
         try:
-            load_config()  # can be modified at runtime
             external_ip = get_external_ip()
             login()
             rules = get_firewall_rules()
@@ -165,6 +165,7 @@ def main():
         except Exception as e:
             LOGGER.error('Error: exception: ' + str(e))
         time.sleep(LOOP_INTERVAL_SEC)
+        load_config()  # can be modified at runtime
 
 
 if __name__ == "__main__":
