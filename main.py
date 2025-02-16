@@ -42,8 +42,8 @@ def load_config() -> None:
 def get_external_ip() -> str:
     try:
         result = subprocess.run(EXTERNAL_IP_COMMAND, shell=True, capture_output=True, text=True, check=True)
-        LOGGER.info(f"External IP:\n{result.stdout}")
         external_ip = result.stdout.strip()
+        LOGGER.info(f"External IP: {external_ip}")
         ipaddress.IPv4Address(external_ip)  # throws AddressValueError if not valid
         return external_ip
     except subprocess.CalledProcessError as e:

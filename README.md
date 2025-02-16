@@ -18,6 +18,18 @@ To install the script, run this one-line command, which downloads the install sc
   fetch -o - https://raw.githubusercontent.com/sirstudly/pfsense-update-plesk-firewall/refs/heads/master/install-whitelist-ip.sh | sh -s
 ```
 
+If you don't already have the Python package installer (pip) installed, install it now:
+```
+  /usr/local/bin/python3.11 -m ensurepip
+  /usr/local/bin/pip3.11 --version  # check installed version
+```
+
+Install the package requirements:
+```
+  cd /usr/local/whitelist-ip/
+  /usr/local/bin/pip3.11 install -r requirements.txt
+```
+
 Configuration
 ---------------------
 
