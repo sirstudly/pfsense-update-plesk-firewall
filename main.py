@@ -31,7 +31,8 @@ def load_config() -> None:
     LOG_FILE = config['Settings'].get("LOG_FILE", LOG_FILE)
     LOOP_INTERVAL_SEC = int(config['Settings'].get("LOOP_INTERVAL_SEC", str(LOOP_INTERVAL_SEC)))
 
-    # Logging setup
+
+def load_logging_config() -> None:
     LOGGER.setLevel(logging.INFO)
     handler = TimedRotatingFileHandler(LOG_FILE, when="midnight", interval=1, backupCount=7)
     handler.suffix = "%Y-%m-%d"
@@ -144,9 +145,10 @@ def apply_changes(forgery_protection_token: str) -> None:
 
 
 def main():
+    load_logging_config()
     while True:
         try:
-            load_config()
+            load_config()  # can be modified at runtime
             external_ip = get_external_ip()
             login()
             rules = get_firewall_rules()
