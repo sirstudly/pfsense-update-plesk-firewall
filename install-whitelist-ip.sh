@@ -1,9 +1,9 @@
 #!/bin/sh
 
-/usr/bin/fetch -o /usr/local/etc/rc.d/whitelist-ip.sh https://raw.githubusercontent.com/sirstudly/pfsense-update-plesk-firewall/refs/heads/master/rc.d/whitelist-ip.sh
+/usr/bin/fetch -o /usr/local/etc/rc.d/whitelist_ip.sh https://raw.githubusercontent.com/sirstudly/pfsense-update-plesk-firewall/refs/heads/master/rc.d/whitelist_ip.sh
 
 # Fix permissions so it'll run
-chmod +x /usr/local/etc/rc.d/whitelist-ip.sh
+chmod +x /usr/local/etc/rc.d/whitelist_ip.sh
 
 # Copy python script and config to /usr/local/whitelist-ip
 echo "Copying files..."

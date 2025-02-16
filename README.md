@@ -43,12 +43,12 @@ To start and stop the controller, use the `service` command from the command lin
 - To start the service:
 
   ```
-    service whitelist-ip.sh start
+    service whitelist_ip.sh start
   ```
   The 'start' command exits immediately while the startup continues in the background.
 
 - To stop the service:
 
   ```
-    service whitelist-ip.sh stop
+    service whitelist_ip.sh stop
   ```

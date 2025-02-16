@@ -6,7 +6,7 @@
 
 . /etc/rc.subr
 
-name="whitelist-ip"
+name="whitelist_ip"
 rcvar="whitelist_ip_enable"
 start_cmd="whitelist_ip_start"
 stop_cmd="whitelist_ip_stop"
