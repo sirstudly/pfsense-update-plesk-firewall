@@ -10,6 +10,7 @@ echo "Copying files..."
 mkdir -p /usr/local/whitelist-ip
 /usr/bin/fetch -o /usr/local/whitelist-ip/main.py https://raw.githubusercontent.com/sirstudly/pfsense-update-plesk-firewall/refs/heads/master/main.py
 /usr/bin/fetch -o /usr/local/whitelist-ip/.env https://raw.githubusercontent.com/sirstudly/pfsense-update-plesk-firewall/refs/heads/master/.env
+/usr/bin/fetch -o /usr/local/whitelist-ip/requirements.txt https://raw.githubusercontent.com/sirstudly/pfsense-update-plesk-firewall/refs/heads/master/requirements.txt
 echo "Configure /usr/local/whitelist-ip/.env manually."
 
 # Add the startup variable to rc.conf.local.

@@ -1,5 +1,4 @@
 from types import SimpleNamespace
-from typing import List
 
 import requests
 import json
