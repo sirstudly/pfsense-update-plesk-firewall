@@ -16,18 +16,19 @@ EXTERNAL_IP_COMMAND = ''
 PLESK_USERNAME = None
 PLESK_PASSWORD = None
 PLESK_HOST = None
-LOG_FILE = "update_firewall.log"
+LOG_FILE = "firewall.log"
 LOGGER = logging.getLogger("pfSense-update-plesk-firewall")
 LOOP_INTERVAL_SEC = 60 * 30
 
 def load_config() -> None:
-    global EXTERNAL_IP_COMMAND, PLESK_USERNAME, PLESK_PASSWORD, PLESK_HOST, LOOP_INTERVAL_SEC
+    global EXTERNAL_IP_COMMAND, PLESK_USERNAME, PLESK_PASSWORD, PLESK_HOST, LOG_FILE, LOOP_INTERVAL_SEC
     config = configparser.ConfigParser()
     config.read('.env')
     EXTERNAL_IP_COMMAND = config['Settings'].get("EXTERNAL_IP_COMMAND")
     PLESK_USERNAME = config['Settings'].get("PLESK_USERNAME")
     PLESK_PASSWORD = config['Settings'].get("PLESK_PASSWORD")
     PLESK_HOST = config['Settings'].get("PLESK_HOST")
+    LOG_FILE = config['Settings'].get("LOG_FILE", LOG_FILE)
     LOOP_INTERVAL_SEC = int(config['Settings'].get("LOOP_INTERVAL_SEC", str(LOOP_INTERVAL_SEC)))
 
     # Logging setup
