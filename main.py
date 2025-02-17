@@ -186,8 +186,30 @@ def apply_changes(token: str, config: Config, logger: logging.Logger) -> None:
         if data.get("status") != "success":
             logger.error(f"Failed to apply firewall changes: {data.get('status')}")
             logger.error(response.text)
+        else:
+            confirm_activation(token, data.get("data"), config, logger)
     else:
         logger.error(f"Failed to apply firewall changes: [{response.status_code}]: {response.text}")
+
+
+def confirm_activation(token: str, applied_action, config: Config, logger: logging.Logger):
+    """
+    Confirm firewall rule changes have been applied.
+    """
+    logger.info("Confirming firewall rules activation...")
+    url = f'https://{config.plesk_host}/modules/firewall/index.php/api/confirm-activation'
+    headers = {
+        'Content-Type': 'application/json',
+        'X-Forgery-Protection-Token': token
+    }
+    response = session.post(url, json=applied_action, headers=headers)
+    if response.status_code == 200:
+        data = response.json()
+        if data.get("status") != "success":
+            logger.error(f"Failed to confirm firewall rules activation: {data.get('status')}")
+            logger.error(response.text)
+    else:
+        logger.error(f"Failed to confirm firewall rules activation: [{response.status_code}]: {response.text}")
 
 
 def main() -> None:
