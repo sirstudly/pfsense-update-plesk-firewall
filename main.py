@@ -187,12 +187,13 @@ def apply_changes(token: str, config: Config, logger: logging.Logger) -> None:
             logger.error(f"Failed to apply firewall changes: {data.get('status')}")
             logger.error(response.text)
         else:
-            confirm_activation(token, data.get("data"), config, logger)
+            logger.info("Firewall changes applied successfully.")
+            # confirm_activation(token, data.get("data"), config, logger)
     else:
         logger.error(f"Failed to apply firewall changes: [{response.status_code}]: {response.text}")
 
 
-def confirm_activation(token: str, applied_action, config: Config, logger: logging.Logger):
+def confirm_activation(token: str, applied_action, config: Config, logger: logging.Logger) -> None:
     """
     Confirm firewall rule changes have been applied.
     """
