@@ -138,39 +138,46 @@ def main():
     if not rules:
         sys.exit(1)
     
-    # Find MySQL and SSH rules
+    # Find rules to whitelist (MySQL, SSH, Plesk admin TCP, Plesk admin HTTP/3)
     mysql_rule = find_rule_by_class(rules, 'mysql')
     ssh_rule = find_rule_by_class(rules, 'ssh')
+    plesk_rule = find_rule_by_class(rules, 'plesk')
+    plesk_http3_rule = find_rule_by_class(rules, 'plesk_http3')
     
     if not mysql_rule:
         logger.error("MySQL rule not found in firewall configuration")
         sys.exit(1)
-        
     if not ssh_rule:
         logger.error("SSH rule not found in firewall configuration")
         sys.exit(1)
+    if not plesk_rule:
+        logger.error("Plesk admin (plesk) rule not found in firewall configuration")
+        sys.exit(1)
+    if not plesk_http3_rule:
+        logger.error("Plesk admin HTTP/3 (plesk_http3) rule not found in firewall configuration")
+        sys.exit(1)
     
-    # Extract current information
-    mysql_rule_id = mysql_rule.get('id')
-    ssh_rule_id = ssh_rule.get('id')
-    mysql_current_ip = mysql_rule.get('from', '')
-    ssh_current_ip = ssh_rule.get('from', '')
+    # Rules to check/update: (rule, label, ports for CLI)
+    rules_to_update = [
+        (mysql_rule, "MySQL", "3306/tcp"),
+        (ssh_rule, "SSH", "22/tcp"),
+        (plesk_rule, "Plesk admin", plesk_rule.get("ports", "8443/tcp,8880/tcp")),
+        (plesk_http3_rule, "Plesk admin HTTP/3", plesk_http3_rule.get("ports", "8443/udp")),
+    ]
     
-    logger.info(f"Current MySQL rule ID: {mysql_rule_id}, IP: '{mysql_current_ip}'")
-    logger.info(f"Current SSH rule ID: {ssh_rule_id}, IP: '{ssh_current_ip}'")
+    # Extract current information and log
     logger.info(f"Dynamic IP: {dynamic_ip}")
     whitelist_ip = (fixed_whitelist_ip.strip() + "," + dynamic_ip) if fixed_whitelist_ip.strip() else dynamic_ip
+    for rule, label, _ in rules_to_update:
+        logger.info(f"Current {label} rule ID: {rule.get('id')}, from: '{rule.get('from', '')}'")
 
     # Check if updates are needed
     needs_update = False
-    
-    if mysql_current_ip != whitelist_ip:
-        logger.info(f"MySQL rule IP changed from '{mysql_current_ip}' to '{whitelist_ip}'")
-        needs_update = True
-    
-    if ssh_current_ip != whitelist_ip:
-        logger.info(f"SSH rule IP changed from '{ssh_current_ip}' to '{whitelist_ip}'")
-        needs_update = True
+    for rule, label, _ in rules_to_update:
+        current_from = rule.get("from", "")
+        if current_from != whitelist_ip:
+            logger.info(f"{label} rule IP changed from '{current_from}' to '{whitelist_ip}'")
+            needs_update = True
     
     if not needs_update:
         logger.info("No IP changes detected. Firewall rules are up to date.")
@@ -178,16 +185,13 @@ def main():
     
     # Update rules if needed
     success = True
-    
-    if mysql_current_ip != whitelist_ip:
-        logger.info(f"Updating MySQL rule (ID: {mysql_rule_id}) with IP: {whitelist_ip}")
-        if not update_firewall_rule(mysql_rule_id, 'input', 'allow', '3306/tcp', whitelist_ip):
-            success = False
-    
-    if ssh_current_ip != whitelist_ip:
-        logger.info(f"Updating SSH rule (ID: {ssh_rule_id}) with IP: {whitelist_ip}")
-        if not update_firewall_rule(ssh_rule_id, 'input', 'allow', '22/tcp', whitelist_ip):
-            success = False
+    for rule, label, ports in rules_to_update:
+        current_from = rule.get("from", "")
+        if current_from != whitelist_ip:
+            rule_id = rule.get("id")
+            logger.info(f"Updating {label} rule (ID: {rule_id}) with IP: {whitelist_ip}")
+            if not update_firewall_rule(rule_id, "input", "allow", ports, whitelist_ip):
+                success = False
     
     # Apply changes if any updates were made
     if success and needs_update:
