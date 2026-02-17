@@ -8,6 +8,10 @@ import logging
 # This script runs on the Plesk server and whitelists the local dynamic IP address for the backoffice processing server
 # eg. copy this into /usr/local/sbin
 
+# This IP address will be included in all firewall rules that are being updated
+fixed_whitelist_ip = "1.2.3.4"
+dyndns_domain = "mydomain.dyndns.com"
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -23,7 +27,7 @@ def get_dynamic_ip():
     """Get the current dynamic IP address."""
     try:
         result = subprocess.run(
-            ['/usr/bin/dig', '+short', 'mydomain.dyndns.com'],
+            ['/usr/bin/dig', '+short', dyndns_domain],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
@@ -155,16 +159,17 @@ def main():
     logger.info(f"Current MySQL rule ID: {mysql_rule_id}, IP: '{mysql_current_ip}'")
     logger.info(f"Current SSH rule ID: {ssh_rule_id}, IP: '{ssh_current_ip}'")
     logger.info(f"Dynamic IP: {dynamic_ip}")
-    
+    whitelist_ip = (fixed_whitelist_ip.strip() + "," + dynamic_ip) if fixed_whitelist_ip.strip() else dynamic_ip
+
     # Check if updates are needed
     needs_update = False
     
-    if mysql_current_ip != dynamic_ip:
-        logger.info(f"MySQL rule IP changed from '{mysql_current_ip}' to '{dynamic_ip}'")
+    if mysql_current_ip != whitelist_ip:
+        logger.info(f"MySQL rule IP changed from '{mysql_current_ip}' to '{whitelist_ip}'")
         needs_update = True
     
-    if ssh_current_ip != dynamic_ip:
-        logger.info(f"SSH rule IP changed from '{ssh_current_ip}' to '{dynamic_ip}'")
+    if ssh_current_ip != whitelist_ip:
+        logger.info(f"SSH rule IP changed from '{ssh_current_ip}' to '{whitelist_ip}'")
         needs_update = True
     
     if not needs_update:
@@ -174,14 +179,14 @@ def main():
     # Update rules if needed
     success = True
     
-    if mysql_current_ip != dynamic_ip:
-        logger.info(f"Updating MySQL rule (ID: {mysql_rule_id}) with IP: {dynamic_ip}")
-        if not update_firewall_rule(mysql_rule_id, 'input', 'allow', '3306/tcp', dynamic_ip):
+    if mysql_current_ip != whitelist_ip:
+        logger.info(f"Updating MySQL rule (ID: {mysql_rule_id}) with IP: {whitelist_ip}")
+        if not update_firewall_rule(mysql_rule_id, 'input', 'allow', '3306/tcp', whitelist_ip):
             success = False
     
-    if ssh_current_ip != dynamic_ip:
-        logger.info(f"Updating SSH rule (ID: {ssh_rule_id}) with IP: {dynamic_ip}")
-        if not update_firewall_rule(ssh_rule_id, 'input', 'allow', '22/tcp', dynamic_ip):
+    if ssh_current_ip != whitelist_ip:
+        logger.info(f"Updating SSH rule (ID: {ssh_rule_id}) with IP: {whitelist_ip}")
+        if not update_firewall_rule(ssh_rule_id, 'input', 'allow', '22/tcp', whitelist_ip):
             success = False
     
     # Apply changes if any updates were made
