@@ -3,6 +3,11 @@ pfsense-update-plesk-firewall
 
 A Python script to update the whitelisted IP address within firewall rules in a Plesk instance.
 
+## UPDATE 2025
+
+The `main.py` module is deprecated as it didn't actually work. There is now an `update_fw_rules.py` script that can be run directly
+on the Plesk server to update the firewall rules (called periodically from cron).
+
 ## Features
 
 - Installs as a service.

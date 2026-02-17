@@ -6,11 +6,16 @@ import sys
 import logging
 
 # This script runs on the Plesk server and whitelists the local dynamic IP address for the backoffice processing server
+# eg. copy this into /usr/local/sbin
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('/var/log/update_fw_rules.log'),
+        logging.StreamHandler(sys.stdout)  # Keep console output as well
+    ]
 )
 logger = logging.getLogger(__name__)
 
